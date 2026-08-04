@@ -1,0 +1,13 @@
+{
+    "name": "sunny/teamhub-api",
+    "description": "Modern PHP Backend API",
+    "type": "project",
+    "require": {
+        "php": "^8.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    }
+}
