@@ -1,0 +1,63 @@
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: teamhub-app
+    volumes:
+      - .:/var/www/html
+    networks:
+      - teamhub
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+  nginx:
+    image: nginx:alpine
+    container_name: teamhub-nginx
+    ports:
+      - "8090:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - teamhub
+
+  database:
+    image: mysql:8.0
+    container_name: teamhub-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - teamhub
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: teamhub-phpmyadmin
+    ports:
+      - "8082:80"
+    environment:
+      PMA_HOST: database
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+    depends_on:
+      - database
+    networks:
+      - teamhub
+
+networks:
+  teamhub:
+
+volumes:
+  db_data:
